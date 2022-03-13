@@ -1,0 +1,19 @@
+Package: ynabr
+Type: Package
+Title: R implementation of YNAB REST API
+Version: 0.1.0
+Authors@R: person(given = "Stefan McKinnon",
+     family = "Edwards",
+     role = c("aut", "cre"),
+     email = "sme@iysik.com")
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + LICENSE
+Encoding: UTF-8
+Require:
+  R (>= 4.1),
+  curl (>= 4.3.2),
+  R6 (> 2.5.0),
+  rlang (>= 0.4.11)
+LazyData: true
+RoxygenNote: 7.1.2

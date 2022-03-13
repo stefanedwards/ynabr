@@ -15,7 +15,7 @@
 YNAB <- R6::R6Class("YNAB",
 public = list(
   #' @description
-  #' Creates a new "YNAB connection"-object, which keeps
+  #' Creates a new "YNAB connection"-object, which keeps track of your budget.
   #'
   #' @param token Personal access token.
   #' @return A new `YNAB` object.
@@ -35,8 +35,9 @@ active = list(
     if (rlang::is_missing(value)) {
       return(private$accessToken)
     } else {
+      value <- as.character(value)
       assertthat::asssert_that(is_character(value, 1))
-      private$accessToken <- value
+      private$accessToken <- trimws(value)
     }
   }
 )

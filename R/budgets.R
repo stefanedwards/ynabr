@@ -12,9 +12,6 @@ api.list.budgets <- function(token, baseurl, include.accounts=FALSE) {
   httr::content(r)$data
 }
 
-endpoint <- function(x, baseurl) {
-  paste0(trimws(baseurl, 'right', '/'), '/', x)
-}
 
 
 token_as_h <- function(token) {

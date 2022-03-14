@@ -24,4 +24,6 @@ test_that('Endpoints are constructed nicely', {
   expect_equal(url.endpoint(baseurl, 'bar'), 'http://foo/bar')
   expect_equal(url.endpoint(baseurl, 'bar', 5, 'nicely'), 'http://foo/bar/5/nicely')
   expect_equal(url.endpoint(baseurl, c('zul',42,'X')), 'http://foo/zul/42/X')
+
+  expect_equal(url.endpoint(baseurl, baseurl, 'bar'), 'http://foo/bar')
 })

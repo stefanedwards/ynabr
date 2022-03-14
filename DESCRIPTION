@@ -16,7 +16,8 @@ Require:
   R6 (> 2.5.0),
   rlang (>= 0.4.11),
   httr (>= 1.4.2),
-  lubridate (>= 1.7.10)
+  lubridate (>= 1.7.10),
+  assertthat (>= 0.2.1)
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 

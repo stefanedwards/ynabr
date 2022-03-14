@@ -14,7 +14,10 @@ parse_utc <- function(x) {
 #' @param ... Additional components that forms the endpoint.
 url.endpoint <- function(baseurl, ...) {
   endpoint <- unlist(list(...)) %>% as.character
+  if (endpoint[1] == baseurl)
+    endpoint <- endpoint[-1]
+
   url <- c(baseurl, endpoint) %>%
     trimws('both', '/')
-  paste(url, collapse='/')
+  paste(url, collapse='/', sep='')
 }

@@ -39,8 +39,8 @@ public = list(
     if (is.null(query)) query <- list()
     assertthat::assert_that(is.list(query))
 
-    if (!(length(endpoint) == 1 && startsWith(endpoint, prefix=private$baseUrl)))
-      endpoint <- url.endpoint(private$baseurl, endpoint)
+    endpoint <- url.endpoint(private$baseUrl, endpoint)
+
 
     latest_knowledge <- self$LatestServerKnowledge(endpoint)
     if (latest_knowledge > 0)
@@ -59,11 +59,11 @@ public = list(
       stop(rate.limited(endpoint, response))
     }
     httr::stop_for_status(response, paste('Failed to request', endpoint))
-    requests <- response$all_headers$`X-Rate-Limit`
+    requests <- response$headers$`X-Rate-Limit`
     if (!is.null(requests)) {
       requests <- strsplit(requests, '/', fixed=TRUE)[[1]]
       private$requests <- as.integer(requests[1])
-      private$limit <- as.integer(request[[2]])
+      private$limit <- as.integer(requests[[2]])
     }
 
     content <- httr::content(response)
@@ -80,7 +80,10 @@ public = list(
   #' @return The server knowledge (delta request) or 0 if none is known.
   LatestServerKnowledge = function(endpoint) {
     assertthat::assert_that(rlang::is_character(endpoint, n=1))
-    as.integer(private$deltas[[endpoint]] %||% 0L)
+    k <- private$deltas[[endpoint]]
+    if (is.null(k))
+      return(0L)
+    return(as.integer(k))
   }
 ),
 private = list(
@@ -98,7 +101,7 @@ active = list(
       return(private$accessToken)
     } else {
       value <- as.character(value)
-      assertthat::asssert_that(is_character(value, 1))
+      assertthat::assert_that(rlang::is_character(value, 1))
       private$accessToken <- trimws(value)
     }
   },

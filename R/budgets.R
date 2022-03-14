@@ -33,12 +33,14 @@ public = list(
   #'   Values/list
   #' @param is.json.list Logical, when \code{TRUE}, \code{id} can be a list.
   #' @importFrom lubridate as_date
-  #' @return A new `YNAB` object.
+  #' @return A new 'Budget' object.
   initialize = function(
     ynab,
     id, name, last_modified_on, first_month, last_month, date_format,
     currency_format, accounts,
     is.json.list = FALSE) {
+    assertthat::assert_that(is.ynab(ynab))
+
     if (is.json.list) {
       call <- id
       call$ynab <- ynab
@@ -46,6 +48,7 @@ public = list(
       return(do.call(YnabBudget$new, call))
     }
 
+    private$ynab <- ynab
     private$id <- as.character(id)
     private$name <- as.character(name)
     private$last_modified_on <- parse_utc(last_modified_on)
@@ -64,6 +67,7 @@ public = list(
   }
 ),
 private = list(
+  ynab = NULL,
   id = NULL,
   name = NULL,
   last_modified_on = NULL,
@@ -74,6 +78,8 @@ private = list(
   accounts = list()
 ),
 active = list(
+  #' @field YNAB YNAB-connection object
+  YNAB = function() { private$ynab },
   #' @field Id
   #' Budget id
   Id = function() { private$id },
@@ -82,3 +88,9 @@ active = list(
   Name = function() { private$name }
 )
 )
+
+#' @rdname is
+#' @export
+is.ynab.budget <- function(x) {
+  return(R6::is.R6(x) && inherits(x, 'YnabBudget'))
+}

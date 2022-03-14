@@ -19,7 +19,7 @@ public = list(
   #' Creates a new "YNAB connection"-object, which keeps track of your budget.
   #'
   #' @param token Personal access token.
-  #' @return A new `YNAB` object.
+  #' @return A new 'YNAB' object.
   initialize = function(token) {
     self$AccessToken <- token
 
@@ -117,3 +117,14 @@ active = list(
 )
 )
 
+#' Object-checkers
+#'
+#' Checks whether an object is of a specific class.
+#'
+#' @return Logical
+#'
+#' @rdname is
+#' @export
+is.ynab <- function(x) {
+  return(R6::is.R6(x) && inherits(x, 'YNAB'))
+}

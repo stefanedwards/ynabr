@@ -2,4 +2,9 @@
 
 export(YNAB)
 export(YnabBudget)
+export(YnabCategory)
+export(YnabCategoryGroup)
+export(is.ynab)
+export(is.ynabcategory)
+export(is.ynabcategorygroup)
 importFrom(lubridate,as_date)

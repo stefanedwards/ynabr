@@ -26,6 +26,7 @@ Config/testthat/edition: 3
 Collate: 
     '0_aux.R'
     'budgets.R'
+    'categories.R'
     'exceptions.R'
     'scheduled_transactions.R'
     'ynab.R'

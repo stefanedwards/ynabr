@@ -1,3 +1,9 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+
+test_that('YNAB objects work', {
+  ynab <- YNAB$new('123')
+
+  expect_true(is.ynab(ynab))
+  expect_false(is.ynab(ynab$AccessToken))
+
+  expect_false(is.null(ynab$BaseUrl))
 })

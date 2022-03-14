@@ -15,6 +15,10 @@ Require:
   curl (>= 4.3.2),
   R6 (> 2.5.0),
   rlang (>= 0.4.11),
-  httr (>= 1.4.2)
+  httr (>= 1.4.2),
+  lubridate (>= 1.7.10)
 LazyData: true
 RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

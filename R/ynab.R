@@ -26,6 +26,7 @@ public = list(
   }
 ),
 private = list(
+  baseUrl = 'https://api.youneedabudget.com/v1',
   accessToken = NA_character_
 ),
 active = list(
@@ -39,6 +40,10 @@ active = list(
       assertthat::asssert_that(is_character(value, 1))
       private$accessToken <- trimws(value)
     }
-  }
+  },
+  #' @field BaseUrl
+  #' The base url of the YNAB v.1 API
+  BaseUrl = function() { private$baseUrl }
 )
 )
+

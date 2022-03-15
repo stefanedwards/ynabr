@@ -1,23 +1,6 @@
-api.list.budgets <- function(token, baseurl, include.accounts=FALSE) {
-  include.account <- as.logical(include.accounts)
-  assertthat::assert_that(rlang::is_logical(include.account, n=1))
-  r <- httr::GET(
-    endpoint('budgets', baseurl),
-    query=list(include_accounts=include.accounts),
-    httr::timeout(5),
-    httr::add_headers(token_as_h(token))
-  )
-
-  httr::stop_for_status(r, "Retrieving list of budgets.")
-  httr::content(r)$data
-}
-
-
-
-
-
-
 #' Budget object
+#'
+#' Create a YNAB budget object.
 #'
 #' @export
 YnabBudget <- R6::R6Class('YnabBudget',
@@ -25,9 +8,9 @@ public = list(
   #' @description
   #' Creates a new YNAB budget-object.
   #'
-  #' @param ynab An \code{\link{YNAB-object}}.
+  #' @param ynab An \code{\link{YNAB}}-object.
   #' @param id,name,last_modified_on,first_month,last_month,date_format,currency_format,accounts
-  #'   Values/list
+  #'   Values
   #' @param ... Additional entries in the json-list, when receiving a
   #'   full budget (with accounts, payees, etc.).
   #' @importFrom lubridate as_date
@@ -66,6 +49,7 @@ public = list(
   },
   #' @description
   #' String representation of this object.
+  #' @param ... Discarded.
   print = function(...) {
     d <- difftime(lubridate::now(), private$last_modified_on)
     cat(glue::glue(
@@ -111,19 +95,16 @@ active = list(
 )
 )
 
-#' @rdname is
+
+#' @rdname YnabBudget
 #' @export
+#' @param x Object to check/convert
+#' @param ynab An \code{\link{YNAB}}-connection object
 is.YnabBudget <- function(x) {
   return(R6::is.R6(x) && inherits(x, 'YnabBudget'))
 }
 
-#' @noRd
-#' @export
-# print.YnabBudget <- function(x, ...) {
-#   browser()
-#   x$print()
-# }
-
+#' @rdname YnabBudget
 #' @export
 as.YnabBudget <- function(x, ynab, ...) {
   if (is.list(x)) {

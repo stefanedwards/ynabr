@@ -2,10 +2,10 @@
 
 rate.limited <- function(endpoint, response, call = sys.call(-1)) {
   if (inherits(response, 'response')) {
-    response <- content(response)
+    response <- httr::content(response)
   }
   now <- lubridate::now()
-  wait <- difftime(lubridate::ceiling_date(now, unit='h'), now, unit='s')
+  wait <- difftime(lubridate::ceiling_date(now, unit='h'), now, units='s')
   structure(
     class = c('rate.limited', 'condition'),
     list(

@@ -2,18 +2,21 @@ Package: ynabr
 Type: Package
 Title: R implementation of YNAB REST API
 Version: 0.1.0
-Authors@R: person(given = "Stefan McKinnon",
+Authors@R: c(
+  person(given = "Stefan McKinnon",
      family = "Edwards",
      role = c("aut", "cre"),
-     email = "sme@iysik.com")
+     email = "sme@iysik.com"),
+  person(given="YNAB", role="cph", comment="Copyright holder for the term YNAB")
+  )
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: MIT + LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
-Require:
-  R (>= 4.1),
-  curl (>= 4.3.2),
-  R6 (> 2.5.0),
+Depends:
+  R (>= 4.1.0)
+Imports:
+  R6 (>= 2.5.0),
   rlang (>= 0.4.11),
   httr (>= 1.4.2),
   lubridate (>= 1.7.10),
@@ -31,5 +34,6 @@ Collate:
     'categories.R'
     'exceptions.R'
     'scheduled_transactions.R'
+    'test-helpers.R'
     'ynab.R'
     'ynabr-package.R'

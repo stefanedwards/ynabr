@@ -1,5 +1,11 @@
 # auxiliary functions
 
+## From some tidyverse
+`%||%` <- function(x,y) {
+  if (!is.null(x)) return(x)
+  return(y)
+}
+
 #' Parse standard ISO 8601 into POSIXTlt
 #' @noRd
 #' @param x Character string.
@@ -13,12 +19,11 @@ parse_utc <- function(x) {
 #' @param baseurl Single string, http://you.domain/'
 #' @param ... Additional components that forms the endpoint.
 url.endpoint <- function(baseurl, ...) {
-  endpoint <- unlist(list(...)) %>% as.character
+  endpoint <- as.character(unlist(list(...)))
   if (endpoint[1] == baseurl)
     endpoint <- endpoint[-1]
 
-  url <- c(baseurl, endpoint) %>%
-    trimws('both', '/')
+  url <- trimws(c(baseurl, endpoint), 'both', '/')
   paste(url, collapse='/', sep='')
 }
 
@@ -27,7 +32,7 @@ url.endpoint <- function(baseurl, ...) {
 #' @noRd
 #' @param token The access token.
 #' @return A named character vector with the token.
-#' @example
+#' @examples
 #' token <- '1234abc'
 #' httr::add_headers(token_as_h(token))
 token_as_h <- function(token) {
@@ -43,7 +48,7 @@ token_as_h <- function(token) {
 #' @param token The access token.
 #' @param ... Additional headers, as named characters.
 #' @return A \code{request} object for a http method, such as \code{\link[httr]{GET}}.
-#' @example
+#' @examples
 #' add_headers('1234abc', 'X-type'='text')
 #' # <request>
 #' # Headers:

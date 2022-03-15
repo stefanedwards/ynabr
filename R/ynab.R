@@ -3,16 +3,20 @@
 #' Use this object for every request to YNAB -- it's similar to an ordinary
 #' database connection.
 #'
-#' To obtain a token, visit \link{https://app.youneedabudget.com/settings/developer}
+#' To obtain a token, visit
+#' \href{https://app.youneedabudget.com/settings/developer}
 #' and create a "Personal Access Token".
 #'
 #' @section Warning:
 #' \emph{\strong{WARNING!}} A personal access token gives full access to your financial
 #' records stored in your YNAB budgets! \strong{Never share your personal access token with anybody!}
-#' @rdname YNAB-object
+#' @rdname YNABobject
 #' @name ynab
 #' @include exceptions.R
 #' @export
+#' @examples
+#' ## create a new connection object:
+#' ynab <- YNAB$new('<personal access token>') ## see warning about token!
 YNAB <- R6::R6Class("YNAB",
 public = list(
   #' @description
@@ -44,12 +48,13 @@ public = list(
     invisible(self)
   },
   #' @description
-  #' String representation of this object.
-  print = function() {
-    glue::glue(
+  #' Prints object
+  #' @param ... Discarded
+  print = function(...) {
+    cat(glue::glue(
       'YNAB connection to {private$baseUrl}\n',
       'Requests remaining this hour: {private$limit - private$requests}'
-    )
+    ))
   },
   #' @description
   #' Queries the YNAB endpoint
@@ -110,9 +115,6 @@ public = list(
     if (is.null(k))
       return(0L)
     return(as.integer(k))
-  },
-  bar = function() {
-    foo.bar()
   }
 ),
 private = list(
@@ -154,25 +156,8 @@ active = list(
 )
 )
 
-foo.bar <- function() {
-  'Hello world!'
-}
-
-#' Object-checkers
-#'
-#' Checks whether an object is of a specific class.
-#'
-#' @return Logical
-#'
-#' @rdname is
-#' @noRd
+#' @rdname YNABobject
 #' @export
 is.ynab <- function(x) {
   return(R6::is.R6(x) && inherits(x, 'YNAB'))
-}
-
-#' @noRd
-#' @export
-print.YNAB <- function(x) {
-  x$print()
 }

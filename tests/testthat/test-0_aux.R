@@ -1,18 +1,18 @@
-library(lubridate)
+require(lubridate, quietly = TRUE, warn.conflicts = FALSE)
 
 test_that('Parsing UTC datetimes', {
   ## UTC
   x <- parse_utc("2022-03-14T11:45:57.821Z")
   expect_s3_class(x, 'POSIXlt')
 
-  expect_equal(date(x), as.Date('2022-03-14'))
+  expect_equal(lubridate::date(x), as.Date('2022-03-14'))
   expect_equal(tz(x), 'UTC')
   expect_equal(second(x), 57.821)
   expect_equal(hour(x), 11)
 
   ## Danish timezone
   x <- parse_utc("2022-03-14T06:34:25+00:00")
-  expect_equal(date(x), as.Date('2022-03-14'))
+  expect_equal(lubridate::date(x), as.Date('2022-03-14'))
   expect_equal(tz(x), 'UTC')
   expect_equal(second(x), 25)
   expect_equal(hour(x), 6)

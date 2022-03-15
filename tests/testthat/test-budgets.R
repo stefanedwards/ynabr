@@ -19,4 +19,3 @@ test_that('Budgets can be created from lists', {
 })
 
 
-

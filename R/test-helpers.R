@@ -1,9 +1,30 @@
 ## test helpers
-mock.YNAB <- function() {
-  ynab <- YNAB$new('1234')
-  unlockBinding("Query", ynab)
-  ynab$Query <- function(...) stop('Query disabled in mock')
-  lockBinding("Query", ynab)
+## These shouldn't be exposed to the end user.
+
+#' Create a mocked YNAB connection object that doesn't perform queries
+#'
+#' @param ... Named arguments of public methods to replace with either a function
+#'   or a simple return value.
+#' @return An YNAB connetion object that shouldn't be able to perform queries.
+mock.YNAB <- function(...) {
+  mocks <- list(...)
+  if (is.null(mocks$Query)) mocks$Query <- function(...) stop('Query disabled in mock')
+
+  accesstoken <- mocks$token %||% '1234'
+
+  ynab <- YNAB$new(accesstoken)
+
+  for (i in seq_along(mocks)) {
+    n <- names(mocks)[i]
+    base::unlockBinding(n, ynab)
+    if (is.function(mocks[[i]])) {
+      ynab[[n]] <- mocks[[i]]
+    } else {
+      ynab[[n]] <- function(...) mocks[[i]]
+    }
+    lockBinding(n, ynab)
+  }
+
   ynab
 }
 
@@ -29,10 +50,10 @@ test.budget.1 <- function() list(
   accounts = list()
 )
 
-GET.budgets <- function(include.accounts=FALSE)
+GET.budgets <- function(budgets, include.accounts=FALSE) {
+  assertthat::assert_that(rlang::is_integerish(budgets, n=1))
+  budgets = replicate(budgets, test.budget.1(), simplify=FALSE)
   list(
-    data = list(
-      test.budget.1()
-    )
+    budgets = budgets
   )
-
+}

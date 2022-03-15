@@ -17,11 +17,13 @@ Require:
   rlang (>= 0.4.11),
   httr (>= 1.4.2),
   lubridate (>= 1.7.10),
-  assertthat (>= 0.2.1)
+  assertthat (>= 0.2.1),
+  glue (>= 1.6.2)
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    mockery (>= 0.4.3)
 Config/testthat/edition: 3
 Collate: 
     '0_aux.R'

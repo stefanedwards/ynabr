@@ -26,6 +26,32 @@ public = list(
     invisible(self)
   },
   #' @description
+  #' Gets an overview of the available budgets.
+  #' @param include.accounts Logical, whether to include the list of budget accounts.
+  load = function(include.accounts=FALSE) {
+    assertthat::assert_that(rlang::is_logical(include.accounts, n=1))
+    response <- self$Query('budgets', method='GET', query=list(include_accounts=include.accounts))
+
+    ## response may also include `default_budget`.
+    budgets <- response$budgets
+    assertthat::assert_that(is.list(budgets))
+    if (length(budgets) == 0) {
+      warning('YNAB returned 0 budgets.')
+      return(invisible(self))
+    }
+    private$budgets <- as.YnabBudget.list(budgets, self, is.list=TRUE)
+
+    invisible(self)
+  },
+  #' @description
+  #' String representation of this object.
+  print = function() {
+    glue::glue(
+      'YNAB connection to {private$baseUrl}\n',
+      'Requests remaining this hour: {private$limit - private$requests}'
+    )
+  },
+  #' @description
   #' Queries the YNAB endpoint
   #'
   #' @param endpoint The endpoint, e.g. \code{/budgets/{budget_id}/settings} (with appropriate fill-in of id).
@@ -52,13 +78,13 @@ public = list(
       endpoint,
       query=query,
       httr::timeout(timeout),
-      httr::add_headers(token_as_h(private$accessToken))
+      add_headers(token=private$accessToken)
     )
 
     if (response$status_code == 429) { ## rate-limited
       stop(rate.limited(endpoint, response))
     }
-    httr::stop_for_status(response, paste('Failed to request', endpoint))
+    httr::stop_for_status(response, paste('request', endpoint))
     requests <- response$headers$`X-Rate-Limit`
     if (!is.null(requests)) {
       requests <- strsplit(requests, '/', fixed=TRUE)[[1]]
@@ -84,6 +110,9 @@ public = list(
     if (is.null(k))
       return(0L)
     return(as.integer(k))
+  },
+  bar = function() {
+    foo.bar()
   }
 ),
 private = list(
@@ -91,7 +120,8 @@ private = list(
   baseUrl = 'https://api.youneedabudget.com/v1',
   deltas = list(),
   requests = 0L,
-  limit = 200L
+  limit = 200L,
+  budgets = list()
 ),
 active = list(
   #' @field AccessToken
@@ -113,9 +143,20 @@ active = list(
   Requests = function() { private$requests },
   #' @field Limit
   #' Number of \emph{Requests} out of the hourly \emph{Limit} done so far.
-  Limit = function() { private$limit }
+  Limit = function() { private$limit },
+  #' @field Budgets
+  #' Returns loaded budgets.
+  Budgets = function() {
+    if (length(private$budgets) == 0)
+      stop('No budgets loaded.')
+    private$budgets
+  }
 )
 )
+
+foo.bar <- function() {
+  'Hello world!'
+}
 
 #' Object-checkers
 #'
@@ -124,7 +165,14 @@ active = list(
 #' @return Logical
 #'
 #' @rdname is
+#' @noRd
 #' @export
 is.ynab <- function(x) {
   return(R6::is.R6(x) && inherits(x, 'YNAB'))
+}
+
+#' @noRd
+#' @export
+print.YNAB <- function(x) {
+  x$print()
 }

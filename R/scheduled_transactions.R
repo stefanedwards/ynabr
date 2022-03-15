@@ -30,9 +30,11 @@ active = list(
   #' @field DateNext
   #' The *next* date for which the Scheduled Transaction is scheduled.
   DateNext = function() { private$date_next },
-  #' @field Frequency,Amount
+  #' @field Frequency
   #' How often the Scheduled Transaction is repeated.
   Frequency = function() { private$frequency },
+  #' @field Amount
+  #' The transaction's amount of monies.
   Amount = function() { private$amount },
   #' @field memo String
   Memo = function() { private$memo },

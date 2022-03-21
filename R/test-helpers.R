@@ -29,14 +29,14 @@ mock.YNAB <- function(...) {
 }
 
 dk.currency.format <- function() list(
-  currency_symbol = 'kr.',
+  iso_code = 'DKK',
+  example_format = "123.456,78",
   decimal_digits = 2L,
   decimal_separator = ',',
-  display_symbol = FALSE,
-  example_format = "123.456,78",
+  symbol_first = FALSE,
   group_separator = '.',
-  iso_code = 'DKK',
-  symbol_first = FALSE
+  currency_symbol = 'kr.',
+  display_symbol = TRUE
 )
 
 test.budget.1 <- function() list(

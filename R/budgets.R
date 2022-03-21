@@ -3,16 +3,16 @@
 #' Create a YNAB budget object.
 #'
 #' @export
-YnabBudget <- R6::R6Class('YnabBudget',
+Budget <- R6::R6Class('Budget',
 public = list(
   #' @description
   #' Creates a new YNAB budget-object.
   #'
   #' @param ynab An \code{\link{YNAB}}-object.
   #' @param id,name,last_modified_on,first_month,last_month,date_format,currency_format,accounts
-  #'   Values
+  #'   Values returned in BudgetSummary-model.
   #' @param ... Additional entries in the json-list, when receiving a
-  #'   full budget (with accounts, payees, etc.).
+  #'   full budget (with accounts, payees, etc.), cf. the BudgetDetail-model.
   #' @importFrom lubridate as_date
   #' @return A new 'Budget' object.
   initialize = function(
@@ -48,7 +48,7 @@ public = list(
     invisible(self)
   },
   #' @description
-  #' String representation of this object.
+  #' Prints this object.
   #' @param ... Discarded.
   print = function(...) {
     d <- difftime(lubridate::now(), private$last_modified_on)
@@ -68,7 +68,16 @@ private = list(
   last_month = NULL,
   date_format = NULL,
   currency_format = NULL,
-  accounts = list()
+  accounts = list(),
+  payees = list(),
+  payee_locations = list(),
+  category_groups = list(),
+  categories = list(),
+  months = list(),
+  transactions = list(),
+  subtransactions = list(),
+  scheduled_transactions = list(),
+  scheduled_subtransactions = list()
 ),
 active = list(
   #' @field YNAB YNAB-connection object
@@ -91,41 +100,59 @@ active = list(
   #' @field CurrencyFormat A list-object describing how to format currencies in YNAB.
   CurrencyFormat = function() { private$currency_format },
   #' @field Accounts  List of accounts.
-  Accounts = function() { private$accounts }
+  Accounts = function() { private$accounts },
+  #' @field Payees List of payees.
+  Payees = function() { private$payees },
+  #' @field PayeeLocations List of payee locations.
+  PayeeLocations = function() { private$payee_locations},
+  #' @field CategoryGroups List of category groups
+  CategroupGroups = function() { private$category_groups },
+  #' @field Categories List of categories.
+  Categories = function() { private$categories },
+  #' @field Months List of months with (scheduled?) transactions.
+  Months = function() { private$months },
+  #' @field Transactions List of transactions
+  Transactions = function() { private$transactions },
+  #' @field Subtransactions List of sub(?)transactions
+  Subtransactions = function() { private$subtransactions },
+  #' @field ScheduledTransactions List of scheduled transactions.
+  ScheduledTransactions = function() { private$scheduled_transactions },
+  #' @field ScheduledSubtransactions List of scheduled sub(?)transactions.
+  ScheduledSubtransactions = function() { private$scheduled_subtransactions }
 )
 )
 
 
-#' @rdname YnabBudget
+#' @rdname Budget
 #' @export
 #' @param x Object to check/convert
 #' @param ynab An \code{\link{YNAB}}-connection object
-is.YnabBudget <- function(x) {
-  return(R6::is.R6(x) && inherits(x, 'YnabBudget'))
+is.Budget <- function(x) {
+  return(R6::is.R6(x) && inherits(x, 'Budget'))
 }
 
-#' @rdname YnabBudget
+#' @rdname Budget
 #' @export
-as.YnabBudget <- function(x, ynab, ...) {
+as.Budget <- function(x, ynab, ...) {
   if (is.list(x)) {
     return(as.YnabBudget.list(x, ynab, ...))
   }
-  UseMethod('as.YnabBudget', x)
+  UseMethod('as.Budget', x)
 }
 
 as.YnabBudget.YnabBudget <- function(x, ...) {
   x
 }
 
-as.YnabBudget.list <- function(x, ynab, is.list=FALSE) {
+as.Budget.list <- function(x, ynab, is.list=FALSE) {
   if (is.list) {
-    budgets <- lapply(x, as.YnabBudget, ynab=ynab)
+    budgets <- lapply(x, as.Budget, ynab=ynab)
     n <- sapply(budgets, function(x) x$Name, simplify=TRUE)
     names(budgets) <- make.unique(n)
     return(budgets)
   }
   x$ynab <- ynab
-  return(do.call(YnabBudget$new, x))
+  return(do.call(Budget$new, x))
 }
 
 

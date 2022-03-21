@@ -30,6 +30,7 @@ Suggests:
 Config/testthat/edition: 3
 Collate: 
     '0_aux.R'
+    'CurrencyFormat.R'
     'budgets.R'
     'categories.R'
     'exceptions.R'

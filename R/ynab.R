@@ -87,7 +87,7 @@ public = list(
     )
 
     if (response$status_code == 429) { ## rate-limited
-      stop(rate.limited(endpoint, response))
+      stop(rate.limited.exception(endpoint, response))
     }
     httr::stop_for_status(response, paste('request', endpoint))
     requests <- response$headers$`X-Rate-Limit`

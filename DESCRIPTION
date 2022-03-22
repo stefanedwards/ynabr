@@ -21,7 +21,8 @@ Imports:
   httr (>= 1.4.2),
   lubridate (>= 1.7.10),
   assertthat (>= 0.2.1),
-  glue (>= 1.6.2)
+  glue (>= 1.6.2),
+  purrr (> 0.3.4)
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 
@@ -31,8 +32,8 @@ Config/testthat/edition: 3
 Collate: 
     '0_aux.R'
     'Account.R'
+    'Budget.R'
     'CurrencyFormat.R'
-    'budgets.R'
     'categories.R'
     'data_formats.R'
     'exceptions.R'

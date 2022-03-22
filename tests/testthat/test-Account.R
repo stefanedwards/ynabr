@@ -161,6 +161,10 @@ test_that('Generics works', {
   l1 <- list(id='test', name='Test', balance=123.45, cleared_balance=100, is_milliunits=FALSE)
   expect_equal(as.Account(l1), a)
 
+  expect_equal(as.Account(list()), list())
+  expect_equal(as.Account(a), a)
+  expect_equal(as.Account(list(a)), list(a))
+
   strict.list <- list(l1=l1, l2=l1)
   not.strict <- strict.list
   not.strict$response <- 'yess'
@@ -172,4 +176,14 @@ test_that('Generics works', {
   expect_equal(as.Account(not.strict, strict=FALSE),
     list(l1=a, l2=a, response='yess', nested=as.Account(strict.list))
   )
+
+  df <- as.data.frame(a)
+  expect_s3_class(df, 'tbl_df')
+  expect_named(df, c('id','name','type','on_budget','closed','note','balance','cleared_balance','uncleared_balance','transfer_payee_id','direct_import_linked','direct_import_in_error','deleted'))
+  expect_equal(nrow(df), 1)
+
+  df <- as.data.frame.Account(list(l1=a, l2=a))
+  expect_s3_class(df, 'tbl_df')
+  expect_named(df, c('id','name','type','on_budget','closed','note','balance','cleared_balance','uncleared_balance','transfer_payee_id','direct_import_linked','direct_import_in_error','deleted'))
+  expect_equal(nrow(df), 2)
 })

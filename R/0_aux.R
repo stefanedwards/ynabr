@@ -11,6 +11,7 @@
 #' @param x Character string.
 #' @return POSIXlt object
 parse_utc <- function(x) {
+  if (lubridate::is.POSIXct(x)) return(x)
   lubridate::fast_strptime(x, '%Y-%m-%dT%H:%M:%OS%z')
 }
 

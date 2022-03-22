@@ -22,7 +22,8 @@ Imports:
   lubridate (>= 1.7.10),
   assertthat (>= 0.2.1),
   glue (>= 1.6.2),
-  purrr (> 0.3.4)
+  dplyr (>= 1.0.7),
+  purrr (>= 0.3.4)
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 

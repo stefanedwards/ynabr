@@ -50,6 +50,10 @@ test.budget.1 <- function() list(
   accounts = list()
 )
 
+dummy.account <- function() {
+  Account$new('{1234}', 'Test account', 123.45, 99, is_milliunits = FALSE)
+}
+
 GET.budgets <- function(budgets, include.accounts=FALSE) {
   assertthat::assert_that(rlang::is_integerish(budgets, n=1))
   budgets = replicate(budgets, test.budget.1(), simplify=FALSE)

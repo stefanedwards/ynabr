@@ -11,6 +11,7 @@
 #' @export
 #' @importFrom assertthat assert_that
 #' @importFrom rlang is_missing
+#' @include 0_aux.R
 Account <- R6::R6Class('Account',
 public = list(
   #' @description
@@ -282,7 +283,9 @@ active = list(
   'lineOfCredit',
   'otherAsset',
   'otherLiability',
+  'personalLoan',
   'payPal',
+  'autoLoan',
   'merchantAccount',
   'investmentAccount',
   'mortgage'
@@ -303,28 +306,32 @@ is.Account <- function(x) {
 #'   Account object.
 #' @export
 as.Account <- function(x, ...) {
-  if (is.list(x)) {
+  if (is.Account(x))
+    return(x)
+  if (is.list(x))
     return(as.Account.list(x, ...))
-  }
+
   UseMethod('as.Account', x)
 }
 
-as.Account.Account <- function(x, ...) {
-  x
-}
 
 as.Account.list <- function(x, strict=TRUE, ...) {
-  nested <- sapply(x, is.list)
+  if (length(x) == 0) return(x)
 
+  if (all(sapply(x, is.atomic))) {
+    return(do.call(Account$new, x))
+  }
+
+  nested <- sapply(x, is.list)
   if (strict && !all(nested) && any(nested)) {
     stop('Will not convert a mixed list with both atomic and list elements. Use `strict=FALSE`.')
   }
 
   if (any(nested)) {
     x[nested] <- lapply(x[nested], as.Account.list, strict=strict)
-    return(x)
   }
-  return(do.call(Account$new, x))
+
+  return(x)
 }
 
 
@@ -335,4 +342,12 @@ as.list.Account <- function(x, ...) {
   x$ToList()
 }
 
-
+#' @describeIn Account Converts a Account object to a data.frame
+#' @export
+#' @param x An Account object or list of Account objects to convert.
+as.data.frame.Account <- function(x, ...) {
+  if (is.list(x)) {
+    return(dplyr::bind_rows(lapply(x, as.list)))
+  }
+  dplyr::as_tibble(as.list(x))
+}

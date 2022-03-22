@@ -5,6 +5,17 @@
 #' In some cases the format will not be available and will be specified as null.
 #'
 #' @export
+#' @examples
+#'
+#' cf <- CurrencyFormat$new(
+#'   iso_code='USD',
+#'   decimal_digits=2, decimal_separator='.',
+#'   symbol_first=TRUE, group_separator=',',
+#'   currency_symbol='$', display_symbol=TRUE
+#' )
+#' as.list(cf)
+#' @importFrom assertthat assert_that
+#' @importFrom rlang is_missing is_scalar_character is_scalar_integer is_scalar_logical
 CurrencyFormat <- R6::R6Class('CurrencyFormat',
 public = list(
   #' @description
@@ -15,8 +26,8 @@ public = list(
   #'   \code{decimal_digits} is integer, and \code{symbol_first} and \code{display_symbol} are logical.
   #' @return A new 'CurrencyFormat' object.
   initialize = function(
-    iso_code, example_format, decimal_digits, decimal_separator,
-    symbol_first, group_separator, currency_symbol, display_symbol
+    iso_code, example_format=NA, decimal_digits=2, decimal_separator='.',
+    symbol_first=FALSE, group_separator=',', currency_symbol='', display_symbol=FALSE
   ) {
 
     private$iso_code <- as.character(iso_code)
@@ -28,7 +39,7 @@ public = list(
     private$currency_symbol <- as.character(currency_symbol)
     private$display_symbol <- as.logical(display_symbol)
 
-	  #private$validate()
+	  private$validate()
 
     invisible(self)
   },
@@ -48,6 +59,7 @@ public = list(
     } else if (private$display_symbol && !private$symbol_first) {
       s <- paste0(s, private$currency_symbol)
     }
+    names(s) <- names(x)
     return(trimws(s))
   },
 
@@ -65,9 +77,10 @@ public = list(
     invisible(self)
   },
   #' @description
-  #' Returns copy of object as a list
+  #' Returns copy of object as a list.
+  #' \code{as.list} is a wrapper for this method.
   #' @return A list
-  AsList = function() {
+  ToList = function() {
     res <- as.list(private)
     res[c(
       'iso_code','example_format','decimal_digits','decimal_separator',
@@ -85,15 +98,15 @@ private = list(
   currency_symbol = NA_character_,
   display_symbol = NA,
   validate = function() {
-    assertthat::assert_that(
-      rlang::is_scalar_character(private$iso_code) && !is.na(private$iso_code),
-      rlang::is_scalar_character(private$example_format), # & !is.na(private$example_format),
-      rlang::is_scalar_integer(private$decimal_digits) && !is.na(private$decimal_digits),
-      rlang::is_scalar_character(private$decimal_separator) && !is.na(private$decimal_separator) && nchar(private$decimal_separator) == 1,
-      rlang::is_scalar_logical(private$symbol_first) && !is.na(private$symbol_first),
-      rlang::is_scalar_character(private$group_separator) && !is.na(private$group_separator) && nchar(private$decimal_separator) == 1,
-      rlang::is_scalar_character(private$currency_symbol) && !is.na(private$currency_symbol),
-      rlang::is_scalar_logical(private$display_symbol) && !is.na(private$display_symbol)
+    assert_that(
+      is_scalar_character(private$iso_code) && !is.na(private$iso_code),
+      is_scalar_character(private$example_format), # & !is.na(private$example_format),
+      is_scalar_integer(private$decimal_digits) && !is.na(private$decimal_digits),
+      is_scalar_character(private$decimal_separator) && !is.na(private$decimal_separator) && nchar(private$decimal_separator) == 1,
+      is_scalar_logical(private$symbol_first) && !is.na(private$symbol_first),
+      is_scalar_character(private$group_separator) && !is.na(private$group_separator) && nchar(private$decimal_separator) == 1,
+      is_scalar_character(private$currency_symbol) && !is.na(private$currency_symbol),
+      is_scalar_logical(private$display_symbol) && !is.na(private$display_symbol)
     )
   }
 ),
@@ -158,13 +171,14 @@ active = list(
 
 
 
-#' @rdname CurrencyFormat
+#' @describeIn CurrencyFormat Checks whether an object is a CurrencyFormat object.
 #' @export
 is.CurrencyFormat <- function(x) {
   return(R6::is.R6(x) && inherits(x, 'CurrencyFormat'))
 }
 
-#' @rdname CurrencyFormat
+#' @describeIn CurrencyFormat Converts a list with named elements to a new
+#'   CurrencyFormat object.
 #' @export
 as.CurrencyFormat <- function(x, ...) {
   if (is.list(x)) {
@@ -182,10 +196,10 @@ as.CurrencyFormat.list <- function(x, ...) {
 }
 
 
-#' @rdname CurrencyFormat
+#' @describeIn CurrencyFormat Converts a CurrencyFormat object to a list.
 #' @export
 #' @param x A CurrencyFormat to check/convert.
 as.list.CurrencyFormat <- function(x, ...) {
-	x$AsList()
+	x$ToList()
 }
 

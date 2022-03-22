@@ -46,3 +46,14 @@ test_that('Conversions works', {
   cn <- as.CurrencyFormat(dk.currency.format())
   expect_equal(as.CurrencyFormat(as.list(cn)), cn)
 })
+
+test_that('Formatting retains names', {
+  cn <- CurrencyFormat$new('')
+  expect_output(print(cn), 'Currency : 123,456.79')
+  x <- c(77, 0.01, 118492.9999)
+  names(x) <- LETTERS[seq_along(x)]
+  res <- cn$format(x)
+  expect_equal(res, c('77.00','0.01','118,493.00'), ignore_attr=TRUE)
+  expect_named(res, names(x))
+
+})

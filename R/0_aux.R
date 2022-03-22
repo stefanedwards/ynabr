@@ -57,3 +57,35 @@ token_as_h <- function(token) {
 add_headers <- function(token, ...) {
   httr::add_headers(token_as_h(token), ...)
 }
+
+
+# Wrappers around common rlang type predicates -----s
+
+#' Wrappers around common rlang type predicates
+#'
+#' @rdname scalar-type-predicates
+#' @param na.ok Logical, when TRUE, the scalar may be a \code{NA}.
+#' @docType internal
+#' @importFrom rlang is_scalar_logical
+is_single_logical <- function(x, na.ok=FALSE) {
+  #browser()
+  if (na.ok && length(x) == 1 && is.na(x)) return(TRUE)
+  return(is_scalar_logical(x) && !is.na(x))
+}
+
+#' @rdname scalar-type-predicates
+#' @importFrom rlang is_scalar_double
+is_single_numeric <- function(x, na.ok=FALSE) {
+  if (na.ok && length(x) == 1 && is.na(x)) return(TRUE)
+  return((is_scalar_double(x) || is_scalar_integer(x)) && is.finite(x))
+}
+
+#' @rdname scalar-type-predicates
+#' @importFrom rlang is_scalar_character
+is_single_string <- function(x, na.ok=FALSE) {
+  if (na.ok && length(x) == 1 && is.na(x)) return(TRUE)
+  return(is_scalar_character(x) && !is.na(x))
+}
+
+
+

@@ -30,9 +30,11 @@ Suggests:
 Config/testthat/edition: 3
 Collate: 
     '0_aux.R'
+    'Account.R'
     'CurrencyFormat.R'
     'budgets.R'
     'categories.R'
+    'data_formats.R'
     'exceptions.R'
     'scheduled_transactions.R'
     'test-helpers.R'

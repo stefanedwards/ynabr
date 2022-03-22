@@ -3,6 +3,8 @@
 #' Create a YNAB budget object.
 #'
 #' @export
+#' @importFrom assertthat assert_that
+#' @importFrom rlang is_missing
 Budget <- R6::R6Class('Budget',
 public = list(
   #' @description
@@ -20,7 +22,7 @@ public = list(
     id, name, last_modified_on, first_month, last_month, date_format,
     currency_format, accounts,
     ...) {
-    assertthat::assert_that(is.ynab(ynab))
+    assert_that(is.ynab(ynab))
 
     # if (is.json.list) {
     #   assertthat::assert_that(is.list(id))
@@ -41,9 +43,8 @@ public = list(
     } else {
       private$date_format <- as.character(date_format)
     }
-
-    assertthat::assert_that(is.list(currency_format))
     private$currency_format <- currency_format
+
 
     invisible(self)
   },
@@ -97,8 +98,13 @@ active = list(
   LastMonth = function() { private$last_month },
   #' @field DateFormat String of how dates are formatted.
   DateFormat = function() { private$date_format },
-  #' @field CurrencyFormat A list-object describing how to format currencies in YNAB.
-  CurrencyFormat = function() { private$currency_format },
+  #' @field CurrencyFormat An \code{\link{CurrencyFormat}}-object describing how
+  #'   to format currencies in YNAB.
+  CurrencyFormat = function(val) {
+    if (is_missing(val))
+      return(private$currency_format)
+    private$currency_format <- as.CurrencyFormat(val)
+  },
   #' @field Accounts  List of accounts.
   Accounts = function() { private$accounts },
   #' @field Payees List of payees.
@@ -106,7 +112,7 @@ active = list(
   #' @field PayeeLocations List of payee locations.
   PayeeLocations = function() { private$payee_locations},
   #' @field CategoryGroups List of category groups
-  CategroupGroups = function() { private$category_groups },
+  CategoryGroups = function() { private$category_groups },
   #' @field Categories List of categories.
   Categories = function() { private$categories },
   #' @field Months List of months with (scheduled?) transactions.
@@ -135,12 +141,12 @@ is.Budget <- function(x) {
 #' @export
 as.Budget <- function(x, ynab, ...) {
   if (is.list(x)) {
-    return(as.YnabBudget.list(x, ynab, ...))
+    return(as.Budget.list(x, ynab, ...))
   }
   UseMethod('as.Budget', x)
 }
 
-as.YnabBudget.YnabBudget <- function(x, ...) {
+as.Budget.Budget <- function(x, ...) {
   x
 }
 
@@ -154,8 +160,5 @@ as.Budget.list <- function(x, ynab, is.list=FALSE) {
   x$ynab <- ynab
   return(do.call(Budget$new, x))
 }
-
-
-
 
 

@@ -5,7 +5,7 @@ library(purrr)
 library(tidyr)
 library(glue)
 
-json.file <- here::here('dev/test-budget.json')
+json.file <- here::here('inst/extdata/test-budget.json')
 if (FALSE) {
   ynab <- YNAB$new(readLines(here::here('secret')))
 
@@ -19,8 +19,10 @@ if (FALSE) {
 
 category_groups <- bind_rows(budget$category_groups) ## only that one
 categories <- bind_rows(budget$categories) %>%
-  mutate_at(vars(budgeted, activity, balance, goal_target), ~./1000) %>%
+  #mutate_at(vars(budgeted, activity, balance, goal_target), ~./1000) %>%
   filter(deleted == FALSE)
+
+categories %>% filter(!is.na(goal_type)) %>% View('categories with targets')
 
 categories.all.months <- bind_rows(budget$month) %>%
   select(-budgeted, -activity, -deleted) %>%
@@ -32,3 +34,59 @@ categories %>% filter(goal_type == 'NEED') ## Plan your spending.
 # No information on how often they are repeated.
 
 
+accounts <- idfy(budget$accounts)
+# No information of interest!
+
+transactions <- bind_rows(budget$transactions)
+
+estimate.debt.account <- function(category_id, transactions) {
+  assert_that(rlang::is_character(category_id), is.data.frame(transactions), is.transaction(transactions))
+  x <- transactions %>% filter(category_id %in% !!category_id) %>%
+    group_by(category_id) %>%
+    count(transfer_account_id)
+  category_count <- x %>% count(category_id, name='nn') %>% pull('nn')
+  assert_that(
+    nrow(x) == length(category_id),
+    all(category_count == 1)
+  )
+  x %>% select(category_id, transfer_account_id)
+}
+
+target.estimate.end.date <- function() {
+
+}
+
+
+#' @param category_id,goal_target,balance Character/numeric values, all refer to those in a DEBT category.
+#' @return Number of payments left on the debt.
+category.estimate.remaining.payments.DEBT <- function(category_id, goal_target, balance, accounts, transactions) {
+  category_id <- as.character(category_id)
+  assert_that(
+    length(category_id) == length(goal_target),
+    length(goal_target) == length(balance),
+    rlang::is_integerish(goal_target, finite=TRUE),
+    rlang::is_integerish(balance, finite=TRUE)
+  )
+  assert_that(is.list(accounts), all(sapply(accounts, is.account)), is.data.frame(transactions), is.transaction(transactions))
+
+  browser()
+  ## get account to get remaining balance:
+  estimate.debt.account(category_id, transactions)
+  remaining <- accounts[[account_id]]$balance
+
+  (remaining - category$balance) / category$goal_target
+}
+
+category.estimate.remaining.payments.DEBT <- function(df, accounts, transactions) {
+  assert_that(is.list(accounts), all(sapply(accounts, is.account)), is.data.frame(transactions), is.transaction(transactions))
+  df_ <- df %>% filter(goal_type == 'DEBT')
+  account_ids <- estimate.debt.account(df_$id, transactions)
+  inner_join(df_, account_ids, by=c('id'='category_id')) %>%
+    mutate(
+      remaining_balance = purrr::map_dbl(transfer_account_id, ~accounts[[.]]$balance),
+      payments_left = (remaining_balance - balance) / goal_target
+    ) %>% select(id, transfer_account_id, name, budgeted, activity, balance, goal_target, remaining_balance, payments_left)
+}
+
+categories %>% category.estimate.remaining.payments.DEBT(accounts, transactions) %>%
+  mutate_if(is.numeric, ~./1000) %>% View

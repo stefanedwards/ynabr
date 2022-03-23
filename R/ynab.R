@@ -43,7 +43,8 @@ public = list(
       warning('YNAB returned 0 budgets.')
       return(invisible(self))
     }
-    private$budgets <- budgets
+    private$budgets <- idfy(budgets, max.depth=0)
+    private$budget_names <- structure(names(private$budgets), .Names=sapply(budgets, `[[`, 'name'))
 
     invisible(self)
   },
@@ -115,6 +116,12 @@ public = list(
     if (is.null(k))
       return(0L)
     return(as.integer(k))
+  },
+  #' @description
+  #' Gets a budget by it's name.
+  #' @param name Name of budget to find.
+  GetBudgetByName = function(name) {
+    private$budgets[[private$budget_names[name]]]
   }
 ),
 private = list(
@@ -123,7 +130,8 @@ private = list(
   deltas = list(),
   requests = 0L,
   limit = 200L,
-  budgets = list()
+  budgets = list(),
+  budget_names = character(0)
 ),
 active = list(
   #' @field AccessToken
@@ -154,11 +162,9 @@ active = list(
     private$budgets
   },
   #' @field BudgetNames
-  #' Returns named vector of budget ids and names
-  BudgetIdNames = function() {
-    x <- sapply(private$budgets, `[[`, 'name')
-    names(x) <- sapply(private$budgets, `[[`, 'id')
-    x
+  #' Character vector of the names of the budgets.
+  BudgetNames = function() {
+    names(private$budget_names)
   }
 )
 )

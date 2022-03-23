@@ -35,6 +35,7 @@ Collate:
     'CurrencyFormat.R'
     'data_formats.R'
     'exceptions.R'
+    'is.R'
     'test-helpers.R'
     'ynab.R'
     'ynabr-package.R'

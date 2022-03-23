@@ -79,6 +79,9 @@ add_headers <- function(token, ...) {
 #'   Accepts \code{"minimal"}, \code{"unique"}, \code{"universal"}, \code{"check_unique"},
 #'   or \code{FALSE} to disable. See \code{\link[vctrs]{vec_as_names}}.
 #' @param ... Arguments passed on to \code{\link[vctrs]{vec_as_names}}.
+#' @return
+#' Input \code{x} with all list-elements named after their element \code{el},
+#' all the way down, up to \code{max.depth} levels.
 idfy <- function(x, el='id', max.depth=Inf, max.none.depth=2, names_repair = 'minimal', ...) {
   assert_that(is.list(x))
   sublists <- sapply(x, is.list, simplify = TRUE)

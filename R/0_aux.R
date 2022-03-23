@@ -61,6 +61,53 @@ add_headers <- function(token, ...) {
   httr::add_headers(token_as_h(token), ...)
 }
 
+# Idfy -- names list-elements by the $id -----
+#' Names list-elements by an element
+#'
+#' @export
+#' @examples
+#' l1 <- list(list(id = '123', name = 'peter'), list(id = '456', name = 'bingo'))
+#' idfy(l1)
+#' @param x List-object to traverse
+#' @param el Name of the list-elements' element to use as name for the list-element.
+#'   Can also be index.
+#' @param max.depth Max recursion depth.
+#' @param max.none.depth If a list-element doesn't contain the named element,
+#'   how many levels can we recurse into without that named element.
+#'   Not used for now.
+#' @param names_repair Ensures that the names for the list-elements are valid.
+#'   Accepts \code{"minimal"}, \code{"unique"}, \code{"universal"}, \code{"check_unique"},
+#'   or \code{FALSE} to disable. See \code{\link[vctrs]{vec_as_names}}.
+#' @param ... Arguments passed on to \code{\link[vctrs]{vec_as_names}}.
+idfy <- function(x, el='id', max.depth=Inf, max.none.depth=2, names_repair = 'minimal', ...) {
+  assert_that(is.list(x))
+  sublists <- sapply(x, is.list, simplify = TRUE)
+  if (!length(sublists) || sum(sublists) == 0) return(x)
+
+  if (rlang::is_integerish(el, n=1, finite=TRUE) && el > 0) {
+    f <- ~if (length(.) < el) '' else .[[el]] %||% ''
+  } else {
+    f <- ~.[[el]] %||% ''
+  }
+  ids <- purrr::map_chr(x[sublists], f)
+
+  nok <- ids == ''
+  if (!all(nok)) {
+    if (length(nok) > 0 & !is.null(names(x)))
+      ids[nok] <- names(x)[sublists][nok]
+    names(x)[sublists] <- ids
+    if (length(names_repair) & names_repair != FALSE) {
+      names(x) <- vctrs::vec_as_names(names(x), repair=names_repair, ...)
+    }
+  }
+
+  if (max.depth > 0)
+    x[sublists] <- lapply(x[sublists], idfy, el=el, max.depth=max.depth-1, max.none.depth=max.none.depth-1, names_repair=names_repair, ...)
+
+
+
+  return(x)
+}
 
 # Wrappers around common rlang type predicates -----s
 

@@ -32,13 +32,9 @@ Suggests:
 Config/testthat/edition: 3
 Collate: 
     '0_aux.R'
-    'Account.R'
-    'Budget.R'
     'CurrencyFormat.R'
-    'categories.R'
     'data_formats.R'
     'exceptions.R'
-    'scheduled_transactions.R'
     'test-helpers.R'
     'ynab.R'
     'ynabr-package.R'

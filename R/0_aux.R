@@ -6,6 +6,8 @@
   return(y)
 }
 
+# --- Functions for querying the YNAB API ---------------
+
 #' Parse standard ISO 8601 into POSIXTlt
 #' @noRd
 #' @param x Character string.

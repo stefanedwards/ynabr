@@ -25,7 +25,7 @@ public = list(
   #' @param token Personal access token.
   #' @return A new 'YNAB' object.
   initialize = function(token) {
-    self$AccessToken <- token
+    self$AccessToken <- trimws(token)
 
     invisible(self)
   },
@@ -43,7 +43,7 @@ public = list(
       warning('YNAB returned 0 budgets.')
       return(invisible(self))
     }
-    private$budgets <- as.YnabBudget.list(budgets, self, is.list=TRUE)
+    private$budgets <- budgets
 
     invisible(self)
   },
@@ -152,6 +152,13 @@ active = list(
     if (length(private$budgets) == 0)
       stop('No budgets loaded.')
     private$budgets
+  },
+  #' @field BudgetNames
+  #' Returns named vector of budget ids and names
+  BudgetIdNames = function() {
+    x <- sapply(private$budgets, `[[`, 'name')
+    names(x) <- sapply(private$budgets, `[[`, 'id')
+    x
   }
 )
 )

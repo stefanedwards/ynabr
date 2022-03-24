@@ -7,6 +7,7 @@
 #' @importFrom assertthat assert_that
 #' @importFrom rlang is_character
 #' @import dplyr
+#' @return Data.frame which maps \code{category_id} to the account (\code{transfer_account_id}).
 guess.debt.account.from.transfer <- function(category_id, transactions) {
   if (is.list(transactions))
     transactions <- bind_rows(transactions)

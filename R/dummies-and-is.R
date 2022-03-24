@@ -53,7 +53,32 @@ is.category <- function(x) {
   )
 }
 
-## TODO: Test !
+#' @rdname dummies
+#' @export
+#' @param ... Named/unnamed values to use in your dummy object.
+dummy.category <- function(...) {
+  default <- list(
+    id = NA_character_,
+    category_group_id = NA_character_,
+    name = NA_character_,
+    hidden = FALSE,
+    type = NA_character_,
+    original_category_group_id = NA_character_,
+    note = NA_character_,
+    budgeted = NA_integer_,
+    activity = NA_integer_,
+    balance = NA_integer_,
+    goal_type = NA_character_,
+    goal_creation_month = NA_character_,
+    goal_target = NA_integer_,
+    goal_target_month = NA_character_,
+    goal_percentage_complete = NA_integer_,
+    deleted = FALSE
+  )
+  merge.list(list(...), default)
+}
+
+
 
 #' @rdname is
 #' @importFrom assertthat has_name

@@ -10,7 +10,10 @@ test_that('Get the debt account from a transfer/transactions', {
     dummy.transaction(id='124', account_id='A', transfer_account_id='B', category_id='Y'),
     dummy.transaction(id='125', account_id='A', transfer_account_id='C', category_id='Z'),
     dummy.transaction(id='126', account_id='A', transfer_account_id='C', category_id='Z'),
-    dummy.transaction(id='127', account_id='B', transfer_account_id='C', category_id='W')
+    dummy.transaction(id='127', account_id='B', transfer_account_id='C', category_id='W'),
+    ## unrelated transfers below
+    dummy.transaction(id='201', account_id='B', transfer_account_id='C', category_id='V'),
+    dummy.transaction(id='202', account_id='B', transfer_account_id=NA_character_, category_id='V')
   )
 
   res <-

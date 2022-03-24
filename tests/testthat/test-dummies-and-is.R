@@ -12,6 +12,18 @@ test_that('Accounts', {
   expect_equal(b$foo, 4)
 })
 
+test_that('Categories', {
+  a <- dummy.category()
+  expect_type(a, 'list')
+  expect_true(is.category(a))
+  expect_true(is.category(as.data.frame(a)))
+
+  b <- dummy.category(id = '1', hidden = TRUE, foo = 4)
+  expect_equal(b$id, '1')
+  expect_equal(b$hidden, TRUE)
+  expect_equal(b$foo, 4)
+})
+
 test_that('Transactions', {
   a <- dummy.transaction()
   expect_type(a, 'list')

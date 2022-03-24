@@ -6,6 +6,19 @@
   return(y)
 }
 
+## From package lemon, from plyr (?)
+merge.list <- function (x, y, ...) {
+  if (length(x) == 0)
+    return(y)
+  if (length(y) == 0)
+    return(x)
+  i = match(names(y), names(x))
+  i = is.na(i)
+  if (any(i))
+    x[names(y)[which(i)]] = y[which(i)]
+  x
+}
+
 # --- Functions for querying the YNAB API ---------------
 
 #' Parse standard ISO 8601 into POSIXTlt

@@ -39,18 +39,8 @@ accounts <- idfy(budget$accounts)
 
 transactions <- bind_rows(budget$transactions)
 
-estimate.debt.account <- function(category_id, transactions) {
-  assert_that(rlang::is_character(category_id), is.data.frame(transactions), is.transaction(transactions))
-  x <- transactions %>% filter(category_id %in% !!category_id) %>%
-    group_by(category_id) %>%
-    count(transfer_account_id)
-  category_count <- x %>% count(category_id, name='nn') %>% pull('nn')
-  assert_that(
-    nrow(x) == length(category_id),
-    all(category_count == 1)
-  )
-  x %>% select(category_id, transfer_account_id)
-}
+categories %>% filter(goal_type == 'DEBT') %>% select(id, name)
+
 
 target.estimate.end.date <- function() {
 
@@ -84,8 +74,10 @@ category.estimate.remaining.payments.DEBT <- function(df, accounts, transactions
   inner_join(df_, account_ids, by=c('id'='category_id')) %>%
     mutate(
       remaining_balance = purrr::map_dbl(transfer_account_id, ~accounts[[.]]$balance),
-      payments_left = (remaining_balance - balance) / goal_target
-    ) %>% select(id, transfer_account_id, name, budgeted, activity, balance, goal_target, remaining_balance, payments_left)
+      payments_left = (remaining_balance + balance) * -1 / goal_target,
+      payments_left = pmax(payments_left, 0)
+    ) %>%
+    select(id, transfer_account_id, name, budgeted, activity, balance, goal_target, remaining_balance, payments_left)
 }
 
 categories %>% category.estimate.remaining.payments.DEBT(accounts, transactions) %>%

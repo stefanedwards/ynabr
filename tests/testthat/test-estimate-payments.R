@@ -44,13 +44,40 @@ test_that('Estimate number (and size) of payments of TBD (savings balance with d
   categories <- bind_rows(
     dummy.category(id='A', goal_type='DEBT'),
     dummy.category(id='B'),
-    dummy.category(id='C', goal_type='TBD', balance=0, goal_target=4, budgeted=0, goal_target_month='2022-07-01'),
-    dummy.category(id='D', goal_type='TBD', balance=4, goal_target=8, budgeted=0, goal_target_month='2022-07-01'),
-    dummy.category(id='E', goal_type='TBD', balance=0, goal_target=8, budgeted=4, goal_target_month='2022-07-01'), ## if a previous activity has used 3, and then we budgeted 3.
+    # "new" category in march, nothing has been put towards it target.
+    dummy.category(id='C', goal_type='TBD', balance=0, goal_target=3, budgeted=0, goal_target_month='2022-07-01'),
+    # some monies already on category's balance, by nothing was been assigned to it this month.
+    dummy.category(id='D', goal_type='TBD', balance=5, goal_target=8, budgeted=0, goal_target_month='2022-07-01'),
+    # as 'C' above, but a transaction has drained the funds including those budgeted to the category
+    dummy.category(id='E', goal_type='TBD', balance=0, goal_target=6, budgeted=4, goal_target_month='2022-07-01'),
+    # old category with funds and additional funds budgeted towards it.
+    dummy.category(id='F', goal_type='TBD', balance=5, goal_target=8, budgeted=1, goal_target_month='2022-07-01'),
     dummy.category()
   )
 
   res <- category.estimate.remaining.payments.TDB(categories, current_month='2022-03-18') %>%
-    select(id, goal_type, budgeted, balance, goal_target, goal_target_month, first_month, payments, installment)
+    select(id, goal_type, budgeted, balance, goal_target, goal_target_month, first_month, payments, installment) %>%
+    arrange(id)
+  d2 <- as.Date('2022-04-01')
+  expect_equal(res, tribble(
+    ~id, ~goal_type, ~budgeted, ~balance, ~goal_target, ~goal_target_month, ~first_month, ~payments, ~installment,
+    'C', 'TBD', 0, 0, 3, '2022-07-01', d2, 3, 1,
+    'D', 'TBD', 0, 5, 8, '2022-07-01', d2, 3, 1,
+    'E', 'TBD', 4, 0, 6, '2022-07-01', d2, 3, 2,
+    'F', 'TBD', 1, 5, 8, '2022-07-01', d2, 3, 1
+  ))
+
+  categories$goal_target_month <- '2022-06-01'
+  res <- category.estimate.remaining.payments.TDB(categories, current_month='2022-03-18', include.target_month=TRUE) %>%
+    select(id, goal_type, budgeted, balance, goal_target, goal_target_month, first_month, payments, installment) %>%
+    arrange(id)
+  expect_equal(res, tribble(
+    ~id, ~goal_type, ~budgeted, ~balance, ~goal_target, ~goal_target_month, ~first_month, ~payments, ~installment,
+    'C', 'TBD', 0, 0, 3, '2022-06-01', d2, 3, 1,
+    'D', 'TBD', 0, 5, 8, '2022-06-01', d2, 3, 1,
+    'E', 'TBD', 4, 0, 6, '2022-06-01', d2, 3, 2,
+    'F', 'TBD', 1, 5, 8, '2022-06-01', d2, 3, 1
+  ))
+
 
 })

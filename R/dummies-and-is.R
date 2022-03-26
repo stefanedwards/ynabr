@@ -111,3 +111,30 @@ dummy.transaction <- function(...) {
 }
 
 
+#' @rdnae is
+#' @importFrom assertthat has_name
+#' @export
+is.scheduled_transaction <- function(x) {
+  has_name(x,
+  c("id", "date_first", "date_next", "frequency", "amount", "memo",
+   "account_id", "payee_id", "category_id", "deleted", "transfer_account_id")
+  )
+}
+
+#' @rdname dummies
+#' @export
+dummy.transaction <- function(id=NA_character, ...) {
+  default <- list(
+    date_first = NA_character_,
+    date_next = NA_character_,
+    frequency = NA_character_,
+    amount = NA_int_,
+    memo = "",
+    account_id = NA_character_,
+    payee_id = NA_character_,
+    category_id = NA_character_,
+    deleted = FALSE,
+    transfer_account_id = NA_character_
+  )
+  merge.list(list(id=id, ...), default)
+}

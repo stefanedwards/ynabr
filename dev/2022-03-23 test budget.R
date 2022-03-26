@@ -41,11 +41,8 @@ transactions <- bind_rows(budget$transactions)
 
 categories %>% filter(goal_type == 'DEBT') %>% select(id, name)
 
-
-target.estimate.end.date <- function() {
-
-}
-
+scheduled_transactions <- bind_rows(budget$scheduled_transactions) %>%
+  inner_join(select(categories, category_name=name, category_id=id), by=c('category_id'))
 
 #' @param category_id,goal_target,balance Character/numeric values, all refer to those in a DEBT category.
 #' @return Number of payments left on the debt.

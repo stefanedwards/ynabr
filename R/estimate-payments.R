@@ -32,7 +32,7 @@ category.estimate.remaining.payments.DEBT <- function(df, accounts, transactions
 #' @param df Data frame of categories
 #' @param current_month As Date object or string ('YYYY-MM-DD') as the basis date for the estimation.
 #' @param include.target_month Logical, whether the goal_target_month is included as the last payment.
-category.estimate.remaining.payments.TDB <- function(df, current_month=Sys.Date(), include.target_month=FALSE, ...) {
+category.estimate.remaining.payments.TBD <- function(df, current_month=Sys.Date(), include.target_month=FALSE, ...) {
   current_month <- as.Date(current_month) %>% lubridate::ceiling_date(unit='month')
   assert_that(!is.na(current_month))
   df %>% filter(goal_type == 'TBD') %>%
@@ -44,3 +44,24 @@ category.estimate.remaining.payments.TDB <- function(df, current_month=Sys.Date(
   )
 
 }
+
+
+#' NEED = Plan Your Spending
+#'
+#'
+category.estimate.remaining.payments.NEED <- function(df, current_month=Sys.Date(), ...) {
+  #current_month <- as.Date(current_month) %>% lubridate::ceiling_date(unit='month')
+  #assert_that(!is.na(current_month))
+  df %>% filter(goal_type == 'NEED', !is.na(goal_target_month) & goal_percentage_complete < 100) %>%
+    mutate(
+      .goal_type = goal_type,
+      goal_type = 'TBD'
+    ) %>% category.estimate.remaining.payments.TBD(current_month = current_month, ...) %>%
+    select(-goal_type) %>% rename(goal_type = .goal_type)
+}
+
+#' MF - monthly savings builder
+#' NEED, with no target month,
+#'   no end date, or anything. simply this amount of money each month.
+#' TB - Savings balance, without date.
+#'   No idea. Include in an "after period" summary?

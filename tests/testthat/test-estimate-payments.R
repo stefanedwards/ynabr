@@ -55,7 +55,7 @@ test_that('Estimate number (and size) of payments of TBD (savings balance with d
     dummy.category()
   )
 
-  res <- category.estimate.remaining.payments.TDB(categories, current_month='2022-03-18') %>%
+  res <- category.estimate.remaining.payments.TBD(categories, current_month='2022-03-18') %>%
     select(id, goal_type, budgeted, balance, goal_target, goal_target_month, first_month, payments, installment) %>%
     arrange(id)
   d2 <- as.Date('2022-04-01')
@@ -68,7 +68,7 @@ test_that('Estimate number (and size) of payments of TBD (savings balance with d
   ))
 
   categories$goal_target_month <- '2022-06-01'
-  res <- category.estimate.remaining.payments.TDB(categories, current_month='2022-03-18', include.target_month=TRUE) %>%
+  res <- category.estimate.remaining.payments.TBD(categories, current_month='2022-03-18', include.target_month=TRUE) %>%
     select(id, goal_type, budgeted, balance, goal_target, goal_target_month, first_month, payments, installment) %>%
     arrange(id)
   expect_equal(res, tribble(
@@ -79,5 +79,21 @@ test_that('Estimate number (and size) of payments of TBD (savings balance with d
     'F', 'TBD', 1, 5, 8, '2022-06-01', d2, 3, 1
   ))
 
+})
+
+test_that('Estimate number (and size) of payments of TBD (savings balance with date)', {
+  categories <- bind_rows(
+    dummy.category(id='A', goal_type='TBD'),
+    dummy.category(id='B'),
+    # "new" category in march, nothing has been put towards it target.
+    dummy.category(id='C', goal_type='TBD', balance=0, goal_target=3, budgeted=0, goal_target_month='2022-07-01'),
+    # some monies already on category's balance, by nothing was been assigned to it this month.
+    dummy.category(id='D', goal_type='NEED', balance=5, goal_target=8, budgeted=0, goal_target_month='2022-07-01', goal_percentage_complete = 5/8*100),
+    # as 'C' above, but a transaction has drained the funds including those budgeted to the category
+    dummy.category(id='E', goal_type='TBD', balance=0, goal_target=6, budgeted=4, goal_target_month='2022-07-01'),
+    # old category with funds and additional funds budgeted towards it.
+    dummy.category(id='F', goal_type='TBD', balance=5, goal_target=8, budgeted=1, goal_target_month='2022-07-01'),
+    dummy.category()
+  )
 
 })

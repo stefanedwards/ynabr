@@ -19,6 +19,19 @@ merge.list <- function (x, y, ...) {
   x
 }
 
+list.coalesce <- function(l, replace=NA_character_) {
+  nulls <- sapply(l, is.null)
+  if (!any(nulls)) return(l)
+  l[nulls] <- replace
+  l
+}
+
+#' @returns Input list with just first 1 element run through list.coalesce
+list.coalesce_1 <- function(l, ...) {
+  l[[1]] <- list.coalesce(l[[1]], ...)
+  l
+}
+
 # --- Functions for querying the YNAB API ---------------
 
 #' Parse standard ISO 8601 into POSIXTlt

@@ -1,5 +1,35 @@
 require(lubridate, quietly = TRUE, warn.conflicts = FALSE)
 
+
+# list.coalesce ---------------
+test_that('NULLs in a list are replaced', {
+  l <- list(a=1:3, b=NULL, c='hello')
+  expect_equal(list.coalesce(l), list(
+    a=1:3, b=NA_character_, c='hello'
+  ))
+  expect_equal(list.coalesce(l, replace='null'), list(
+    a=1:3, b='null', c='hello'
+  ))
+  l$b <- 'not null'
+  expect_equal(list.coalesce(l), list(
+    a=1:3, b='not null', c='hello'
+  ))
+
+  ## coalse 1
+  ll <- list(
+    x = list(a=1:3, b=NULL, c='hello'),
+    y = list(a=1:3, b=NULL, c='hello')
+  )
+  expect_equal(list.coalesce_1(ll), list(
+    x = list(a=1:3, b=NA_character_, c='hello'),
+    y = list(a=1:3, b=NULL, c='hello')
+  ))
+  expect_equal(ll, list( ## input was not taken by reference!
+    x=list(a=1:3, b=NULL, c='hello'),
+    y=list(a=1:3, b=NULL, c='hello')
+  ))
+})
+
 test_that('Parsing UTC datetimes', {
   ## UTC
   x <- parse_utc("2022-03-14T11:45:57.821Z")

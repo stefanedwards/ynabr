@@ -39,21 +39,12 @@ dk.currency.format <- function() list(
   display_symbol = TRUE
 )
 
-test.budget.1 <- function() list(
-  id = '1234',
-  name = 'test budget 1',
-  last_modified_on = '2022-03-15T08:26:52.361Z',
-  first_month = '2022-02-01',
-  last_month = '2022-04-01',
-  date_format = list(format = 'DD-MM-YYYY'),
-  currency_format = dk.currency.format(),
-  accounts = list()
-)
 
-GET.budgets <- function(budgets, include.accounts=FALSE) {
-  assertthat::assert_that(rlang::is_integerish(budgets, n=1))
-  budgets = replicate(budgets, test.budget.1(), simplify=FALSE)
-  list(
-    budgets = budgets
-  )
+
+#' @export
+#' @returns List object, such as the one returned from the YNAB API.
+#'   This one is an entirely fictious budget.
+load.test.budget <- function(lib.loc=NULL) {
+  json.file <- system.file('extdata/test-budget.json', package = 'ynabr', lib.loc=lib.loc, mustWork=TRUE)
+  jsonlite::read_json(json.file, simplifyVector = TRUE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
 }

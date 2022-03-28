@@ -8,7 +8,7 @@ test_that('YNAB objects work', {
 })
 
 test_that('YNAB can load several budgets', {
-  ynab <- mock.YNAB(Query=GET.budgets(1))
+  ynab <- mock.YNAB(Query=function(...) { list(budgets=list(load.test.budget())) })
   l <- ynab$load()$Budgets
   expect_equal(length(l), 1)
   expect_true(is.budget(l[[1]]))

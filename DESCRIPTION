@@ -38,7 +38,7 @@ Collate:
     'guess-connections.R'
     'estimate-payments.R'
     'exceptions.R'
-    'scheduled-transactions.R'
     'test-helpers.R'
+    'transactions.R'
     'ynab.R'
     'ynabr-package.R'

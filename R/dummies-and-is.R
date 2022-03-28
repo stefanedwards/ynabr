@@ -154,38 +154,6 @@ dummy.category <- function(...) {
 }
 
 
-
-#' @rdname is
-#' @importFrom assertthat has_name
-#' @export
-is.transaction <- function(x) {
-  has_name(x, c("id", "date", "amount", "cleared", "approved", "account_id",
-                "payee_id", "deleted", "memo", "category_id", "transfer_account_id",
-                "transfer_transaction_id")
-  )
-}
-
-#' @rdname dummies
-#' @export
-dummy.transaction <- function(...) {
-  default <- list(
-    id = NA_character_,
-    date = as.character(Sys.Date()),
-    amount = NA_integer_,
-    memo = '',
-    cleared = NA_character_,
-    approved = FALSE,
-    account_id = NA_character_,
-    payee_id = NA_character_,
-    category_id = NA_character_,
-    deleted = FALSE,
-    transfer_account_id = NA_character_,
-    transfer_transaction_id = NA_character_
-  )
-  merge.list(list(...), default)
-}
-
-
 #' @rdname is
 #' @importFrom assertthat has_name
 #' @export
@@ -230,6 +198,60 @@ is.scheduled_subtransaction <- function(x) {
 dummy.scheduled_subtransaction <- function(id=NA_character_, ...) {
   default <- list(
     scheduled_transaction_id = NA_character_,
+    amount = NA_integer_,
+    memo = "",
+    payee_id = NA_character_,
+    category_id = NA_character_,
+    transfer_account_id = NA_character_,
+    deleted = FALSE
+  )
+  merge.list(list(id=id, ...), default)
+}
+
+#' @rdname is
+#' @importFrom assertthat has_name
+#' @export
+is.transaction <- function(x) {
+  has_name(x, c("id", "date", "amount", "cleared", "approved", "account_id",
+                "payee_id", "deleted", "memo", "category_id", "transfer_account_id",
+                "transfer_transaction_id")
+  )
+}
+
+#' @rdname dummies
+#' @export
+dummy.transaction <- function(id=NA_character_, ...) {
+  default <- list(
+    date = as.character(Sys.Date()),
+    amount = NA_integer_,
+    memo = '',
+    cleared = NA_character_,
+    approved = FALSE,
+    account_id = NA_character_,
+    payee_id = NA_character_,
+    category_id = NA_character_,
+    deleted = FALSE,
+    transfer_account_id = NA_character_,
+    transfer_transaction_id = NA_character_
+  )
+  merge.list(list(id=id, ...), default)
+}
+
+#' @rdname is
+#' @importFrom assertthat has_name
+#' @export
+is.subtransaction <- function(x) {
+  has_name(x, c(
+    "id", "transaction_id", "amount", "memo", "payee_id", "category_id",
+    "transfer_account_id", "deleted"
+  ))
+}
+
+#' @rdname dummies
+#' @export
+dummy.subtransaction <- function(id=NA_character_, ...) {
+  default <- list(
+    transaction_id = NA_character_,
     amount = NA_integer_,
     memo = "",
     payee_id = NA_character_,

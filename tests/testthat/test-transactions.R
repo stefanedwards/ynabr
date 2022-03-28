@@ -70,6 +70,54 @@ test_that('Vectorized date repeater works', {
   expect_date(res[[2]], c('2022-03-02','2022-03-16'))
 })
 
+test_that('Merging transactions with its split transactions work', {
+  budget <- dummy.budget(
+    transactions = list(
+      dummy.transaction('1', amount=5, payee_id='foo'), ## not split,
+      dummy.transaction('2', amount=10, payee_id='bar'), ## split normal (later on)
+      dummy.transaction('3', amount=10, payee_id='Transfer: A'), ## split transfer
+      dummy.transaction('4', amount=10, payee_id='zoo')  ## combo split (e.g. getting withdrawal with a purchase)
+    )
+  )
+  res <- build.transactions(budget)
+  expect_true(is.transaction(res))
+  expect_equal(nrow(res), length(budget$transactions))
+
+  budget$subtransactions <- list(
+    dummy.subtransaction('2a', amount=7, transaction_id='2', category_id='cat1'),
+    dummy.subtransaction('2b', amount=3, transaction_id='2', category_id='cat2'),
+    dummy.subtransaction('3a', amount=6, transaction_id='3', transfer_account_id='A'),
+    dummy.subtransaction('3b', amount=4, transaction_id='3', transfer_account_id='B'),
+    dummy.subtransaction('4a', amount=8, transaction_id='4', category_id='cat1'),
+    dummy.subtransaction('4b', amount=2, transaction_id='4', payee_id='Transfer: B', transfer_account_id='B')
+  )
+  res <- build.transactions(budget)
+  expect_true(is.transaction(res))
+  expect_equal(nrow(res), length(budget$subtransactions)+1)
+  res %>% filter(transaction_id == '2') %>%
+    select(id, amount, payee_id, category_id) %>%
+    expect_equal(tribble(
+      ~id, ~amount, ~payee_id, ~category_id,
+      '2a', 7, 'bar', 'cat1',
+      '2b', 3, 'bar', 'cat2'
+    ))
+  res %>% filter(transaction_id == '3') %>%
+    select(id, amount, payee_id, category_id, transfer_account_id) %>%
+    expect_equal(tribble(
+      ~id, ~amount, ~payee_id, ~category_id, ~transfer_account_id,
+      '3a', 6, 'Transfer: A', NA_character_, 'A',
+      '3b', 4, 'Transfer: A', NA_character_, 'B'
+    ))
+  res %>% filter(transaction_id == '4') %>%
+    select(id, amount, payee_id, category_id, transfer_account_id) %>%
+    expect_equal(tribble(
+      ~id, ~amount, ~payee_id, ~category_id, ~transfer_account_id,
+      '4a', 8, 'zoo', 'cat1', NA_character_,
+      '4b', 2, 'Transfer: B', NA_character_, 'B'
+    ))
+s})
+
+
 test_that('Merging scheduled transactions with its split transactions work', {
   budget <- load.test.budget()
   scheduled <- dplyr::bind_rows(budget$scheduled_transactions)

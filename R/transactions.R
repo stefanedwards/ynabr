@@ -51,7 +51,36 @@ repeat.scheduled.transactions <- function(df, column = c('date_first','date_next
 repeat.dates <- Vectorize(.repeat.dates, vectorize.args=c('start', 'frequency'), SIMPLIFY = FALSE, USE.NAMES=FALSE)
 
 
+#' Merge transactions and subtransactions
+#'
+#'
+#' @rdname transactions
 #' @returns Data.frame where a split transaction has been replaced by its subtransactions.
+#' @export
+build.transactions <- function(budget) {
+  assert_that(is.full_budget(budget), length(budget$transactions) > 0)
+  transactions <- list.coalesce_1(budget$transactions) %>%
+    bind_rows()
+  if (length(budget$subtransactions) == 0) return(transactions %>% mutate(transaction_id = id))
+  subs <- list.coalesce_1(budget$subtransactions) %>%
+    bind_rows() %>%
+    inner_join(transactions, by=c('transaction_id'='id')) %>%
+    mutate(
+      category_id = category_id.x,
+      amount = amount.x,
+      memo = paste0(memo.y, ifelse(nchar(memo.y) & nchar(memo.x), ' // ', ''), memo.x),
+      payee_id = coalesce(payee_id.x,payee_id.y),
+      deleted = deleted.x | deleted.y,
+      transfer_account_id = transfer_account_id.x
+    ) %>%
+    select(-ends_with('.x'), -ends_with('.y'))
+
+  ## merge back into scheduled, replacing the split transactions
+  anti_join(transactions, subs, by=c('id'='transaction_id')) %>%
+    bind_rows(subs)
+}
+
+#' @rdname transactions
 #' @export
 build.scheduled.transactions <- function(budget) {
   assert_that(is.full_budget(budget), length(budget$scheduled_transactions) > 0)

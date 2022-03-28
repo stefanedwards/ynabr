@@ -35,18 +35,6 @@ test_that('Categories', {
   expect_equal(b$foo, 4)
 })
 
-test_that('Transactions', {
-  a <- dummy.transaction()
-  expect_type(a, 'list')
-  expect_true(is.transaction(a))
-  expect_true(is.transaction(as.data.frame(a)))
-
-  b <- dummy.transaction(id = '1', approved = TRUE, foo = 4)
-  expect_equal(b$id, '1')
-  expect_equal(b$approved, TRUE)
-  expect_equal(b$foo, 4)
-})
-
 test_that('Scheduled transactions', {
   a <- dummy.scheduled_transaction()
   expect_type(a, 'list')
@@ -66,6 +54,30 @@ test_that('Scheduled subtransactions (split scheduled transactions)', {
   expect_true(is.scheduled_subtransaction(as.data.frame(a)))
 
   b <- dummy.scheduled_subtransaction(id = '1', approved = TRUE, foo = 4)
+  expect_equal(b$id, '1')
+  expect_equal(b$approved, TRUE)
+  expect_equal(b$foo, 4)
+})
+
+test_that('Transactions', {
+  a <- dummy.transaction()
+  expect_type(a, 'list')
+  expect_true(is.transaction(a))
+  expect_true(is.transaction(as.data.frame(a)))
+
+  b <- dummy.transaction(id = '1', approved = TRUE, foo = 4)
+  expect_equal(b$id, '1')
+  expect_equal(b$approved, TRUE)
+  expect_equal(b$foo, 4)
+})
+
+test_that('Subtransactions (split transactions)', {
+  a <- dummy.subtransaction()
+  expect_type(a, 'list')
+  expect_true(is.subtransaction(a))
+  expect_true(is.subtransaction(as.data.frame(a)))
+
+  b <- dummy.subtransaction(id = '1', approved = TRUE, foo = 4)
   expect_equal(b$id, '1')
   expect_equal(b$approved, TRUE)
   expect_equal(b$foo, 4)

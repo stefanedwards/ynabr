@@ -115,7 +115,7 @@ test_that('Merging transactions with its split transactions work', {
       '4a', 8, 'zoo', 'cat1', NA_character_,
       '4b', 2, 'Transfer: B', NA_character_, 'B'
     ))
-s})
+})
 
 
 test_that('Merging scheduled transactions with its split transactions work', {

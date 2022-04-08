@@ -131,9 +131,8 @@ is.category <- function(x) {
 
 #' @rdname dummies
 #' @export
-dummy.category <- function(...) {
+dummy.category <- function(id = NA_character_, ...) {
   default <- list(
-    id = NA_character_,
     category_group_id = NA_character_,
     name = NA_character_,
     hidden = FALSE,
@@ -150,7 +149,7 @@ dummy.category <- function(...) {
     goal_percentage_complete = NA_integer_,
     deleted = FALSE
   )
-  merge.list(list(...), default)
+  merge.list(list(id=id, ...), default)
 }
 
 
@@ -170,7 +169,7 @@ dummy.scheduled_transaction <- function(id=NA_character_, ...) {
   default <- list(
     date_first = NA_character_,
     date_next = NA_character_,
-    frequency = NA_character_,
+    frequency = "never",
     amount = NA_integer_,
     memo = "",
     flag_color = NA_integer_,

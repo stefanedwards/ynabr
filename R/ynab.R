@@ -4,7 +4,7 @@
 #' database connection.
 #'
 #' To obtain a token, visit
-#' \href{https://app.youneedabudget.com/settings/developer}
+#' \url{https://app.youneedabudget.com/settings/developer}
 #' and create a "Personal Access Token".
 #'
 #' @section Warning:

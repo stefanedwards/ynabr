@@ -23,7 +23,8 @@ Imports:
   assertthat (>= 0.2.1),
   glue (>= 1.6.2),
   dplyr (>= 1.0.7),
-  purrr (>= 0.3.4)
+  purrr (>= 0.3.4),
+  tidyr (>= 1.1.3)
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 
@@ -38,7 +39,8 @@ Collate:
     'guess-connections.R'
     'estimate-payments.R'
     'exceptions.R'
-    'test-helpers.R'
     'transactions.R'
+    'forecasting.R'
+    'test-helpers.R'
     'ynab.R'
     'ynabr-package.R'

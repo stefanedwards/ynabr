@@ -1,14 +1,15 @@
 
 
 #' @export
-repeat.scheduled.transactions <- function(df, column = c('date_first','date_next'), end_date) {
-  column <- match.arg(column)
-  col <- rlang::sym(column)
+#' @importFrom assertthat assert_that
+#' @import lubridate
+repeat.scheduled.transactions <- function(df, end_date) {
+  end_date <- as.Date(end_date)
+  assert_that(is.Date(end_date))
 
   df %>%
-    mutate(date_next = purrr::map2(date_next, frequency, .repeat.dates, end='2022-06-01')) %>%
+    mutate(date_next = purrr::map2(date_next, frequency, .repeat.dates, end=end_date)) %>%
     tidyr::unnest(date_next)
-
 }
 
 #' @import lubridate
@@ -77,7 +78,11 @@ build.transactions <- function(budget) {
 
   ## merge back into scheduled, replacing the split transactions
   anti_join(transactions, subs, by=c('id'='transaction_id')) %>%
-    bind_rows(subs)
+    bind_rows(subs) %>%
+    mutate(
+      reconciled = cleared == 'reconciled',
+      cleared = cleared == 'cleared'
+    )
 }
 
 #' @rdname transactions
@@ -103,4 +108,24 @@ build.scheduled.transactions <- function(budget) {
   ## merge back into scheduled, replacing the split transactions
   anti_join(scheduled, subs, by=c('id'='scheduled_transaction_id')) %>%
     bind_rows(subs)
+}
+
+
+#' @export
+add.account.info <- function(transactions, budget) {
+  assert_that(is.full_budget(budget), length(budget$accounts) > 0, is.data.frame(transactions))
+
+  budget$accounts %>% bind_rows() %>%
+    select(account_id = id, account_name = name, account_on_budget=on_budget) %>%
+    right_join(transactions, by='account_id')
+}
+
+
+monthly.expenses.by.category <- function(transactions) {
+  assert_that(is.data.frame(transactions), is.transaction(transactions))
+  transactions %>%
+    mutate(date = as_date(date)) %>%
+    group_by(month = month(date), year=year(date), category_id) %>%
+    summarise(total_amount = sum(amount))
+
 }

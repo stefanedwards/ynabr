@@ -28,9 +28,11 @@ test_that('Estimate payments left on DEBT', {
     dummy.category(id='V', goal_type=NA_character_, balance=0, goal_target=10)
   )
 
+  suppressWarnings(
   res <- category.estimate.remaining.payments.DEBT(categories, accounts, tr) %>%
     arrange(id) %>%
     select(id, transfer_account_id, category_balance, goal_target, remaining_balance, payments_left)
+  )
 
   expect_equal(res, tribble(
     ~id, ~transfer_account_id, ~category_balance, ~goal_target, ~remaining_balance, ~payments_left,

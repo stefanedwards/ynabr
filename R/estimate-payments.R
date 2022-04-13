@@ -7,14 +7,18 @@
 #' @importFrom assertthat assert_that
 #' @import dplyr
 #' @include guess-connections.R
-category.estimate.remaining.payments.DEBT <- function(df, accounts, transactions, ...) {
+category.estimate.remaining.payments.DEBT <- function(categories, accounts, transactions, ...) {
   assert_that(is.list(accounts), all(sapply(accounts, is.account)), is.data.frame(transactions), is.transaction(transactions))
-  df %>% filter(goal_type == 'DEBT') %>% pull(id) %>%
-    guess.debt.account.from.transfer(., transactions) %>%
-    rename(id=category_id) %>%
-    inner_join(df, by=c('id')) %>%
+
+  accounts <- idfy(accounts, max.depth=1)
+
+  categories %>% filter(goal_type == 'DEBT') %>%
+    left_join(
+      guess.debt.account.from.transfer(transactions, ...) %>% select(-transfers),
+      by=c('id'='category_id')
+    ) %>%
     mutate(
-      remaining_balance = purrr::map_dbl(transfer_account_id, ~accounts[[.]]$balance),
+      remaining_balance = purrr::map_dbl(transfer_account_id, ~accounts[[.]]$balance %||% NA),
       payments_left = (remaining_balance + balance) * -1 / goal_target,
       payments_left = pmax(payments_left, 0)
     ) %>%

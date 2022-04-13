@@ -16,24 +16,55 @@ test_that('Get the debt account from a transfer/transactions', {
     dummy.transaction(id='202', account_id='B', transfer_account_id=NA_character_, category_id='V')
   )
 
-  res <-
   expect_equal(
-    guess.debt.account.from.transfer(c('Y','Z','W'), tr),
+    guess.debt.account.from.transfer(tr, c('Y','Z','W')) %>%
+      arrange(category_id) %>% select(category_id, transfer_account_id),
     tribble(~category_id, ~transfer_account_id,
       'W','C',
       'Y','B',
       'Z','C'
-    )
+    ) %>% as.data.frame
   )
-})
 
-test_that('Single category used for multiple debt-accounts fails', {
-  ## transfer X monies FROM account A TO account B
-  ## amount taken from category Y
+  expect_warning(
+    expect_equal(
+      guess.debt.account.from.transfer(tr) %>%
+        arrange(category_id) %>% select(category_id, transfer_account_id),
+      tribble(~category_id, ~transfer_account_id,
+              'V', NA,
+              'W','C',
+              'Y','B',
+              'Z','C'
+      )
+    ),
+    regexp = 'Some transfers point to none or multiple accounts in `guess.debt.account.from.transfer`!',
+    fixed = TRUE
+  )
+
+  ## Single category used for multiple debt-accounts fails
   tr <- dplyr::bind_rows(
     dummy.transaction(id='123', account_id='A', transfer_account_id='B', category_id='Y'),
     dummy.transaction(id='124', account_id='A', transfer_account_id='C', category_id='Y')
   )
-  expect_error(guess.debt.account.from.transfer('Y', tr))
+  expect_warning(
+    expect_equal(
+      guess.debt.account.from.transfer(tr) %>%
+        arrange(category_id) %>% select(category_id, transfer_account_id),
+      tribble(~category_id, ~transfer_account_id,
+              'Y', NA_character_
+      )
+    ),
+    regexp = 'Some transfers point to none or multiple accounts in `guess.debt.account.from.transfer`!',
+    fixed = TRUE
+  )
+
+  ## but no warnings.
+  expect_equal(
+    guess.debt.account.from.transfer(tr, warnings=FALSE) %>%
+      arrange(category_id) %>% select(category_id, transfer_account_id),
+    tribble(~category_id, ~transfer_account_id,
+            'Y', NA_character_
+    )
+  )
 
 })

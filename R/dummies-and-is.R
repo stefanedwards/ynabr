@@ -136,7 +136,6 @@ dummy.category <- function(id = NA_character_, ...) {
     category_group_id = NA_character_,
     name = NA_character_,
     hidden = FALSE,
-    type = NA_character_,
     original_category_group_id = NA_character_,
     note = NA_character_,
     budgeted = NA_integer_,
